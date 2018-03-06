@@ -24,24 +24,35 @@ class Pong {
 		let lastTime;
 		const callback = (milliSec) => {
 			if (lastTime) {
-				this.update((milliSec - lastTime) / 1000);
+				this.update((milliSec - lastTime) / 800);
 			}
 			lastTime = milliSec;
 			requestAnimationFrame(callback);
 		};
 		callback();
 	}
-	draw(){
+
+	collide(player, ball) {
+		if (player.left < ball.right && player.right > ball.left &&
+			player.top < ball.bottom && player.bottom > ball.top) {
+			ball.vel.x = -ball.vel.x;
+		}
+	}
+
+
+	draw() {
 		this._context.fillStyle = '#000';
 		this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
 
 		this.drawRect(this.ball);
 		this.players.forEach(player => this.drawRect(player));
 	}
-	drawRect(rect){
+
+	drawRect(rect) {
 		this._context.fillStyle = '#fff';
 		this._context.fillRect(rect.left, rect.top, rect.size.x, rect.size.y);
 	}
+
 	update(deltaTime) {
 		this.ball.pos.x += this.ball.vel.x * deltaTime;
 		this.ball.pos.y += this.ball.vel.y * deltaTime;
@@ -54,6 +65,8 @@ class Pong {
 		}
 
 		this.players[1].pos.y = this.ball.pos.y;
+
+		this.players.forEach(player => this.collide(player, this.ball));
 
 		this.draw();
 	}
@@ -71,15 +84,19 @@ class Rect {
 		this.pos = new Vec;
 		this.size = new Vec(w, h)
 	}
+
 	get left() {
 		return this.pos.x - this.size.x / 2;
 	}
+
 	get right() {
 		return this.pos.x + this.size.x / 2;
 	}
+
 	get top() {
 		return this.pos.y - this.size.y / 2;
 	}
+
 	get bottom() {
 		return this.pos.y + this.size.y / 2;
 	}
@@ -92,8 +109,8 @@ class Ball extends Rect {
 	}
 }
 
-class Player extends Rect{
-	constructor(){
+class Player extends Rect {
+	constructor() {
 		super(20, 100);
 		this.score = 0;
 	}
@@ -104,4 +121,4 @@ const pong = new Pong(canvas);
 
 canvas.addEventListener('mousemove', event => {
 	pong.players[0].pos.y = event.offsetY;
-})
+});
