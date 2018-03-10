@@ -4,11 +4,6 @@ class Pong {
 		this._context = canvas.getContext('2d');
 
 		this.ball = new Ball;
-		this.ball.pos.x = 100;
-		this.ball.pos.y = 50;
-
-		this.ball.vel.x = 100;
-		this.ball.vel.y = 100;
 
 		this.players = [
 			new Player,
@@ -30,6 +25,8 @@ class Pong {
 			requestAnimationFrame(callback);
 		};
 		callback();
+
+		this.reset();
 	}
 
 	collide(player, ball) {
@@ -53,12 +50,32 @@ class Pong {
 		this._context.fillRect(rect.left, rect.top, rect.size.x, rect.size.y);
 	}
 
+	reset(){
+		this.ball.pos.x = this._canvas.width / 2;
+		this.ball.pos.y = this._canvas.height / 2;
+
+		this.ball.vel.x = 100;
+		this.ball.vel.y = 100;
+	}
+
 	update(deltaTime) {
 		this.ball.pos.x += this.ball.vel.x * deltaTime;
 		this.ball.pos.y += this.ball.vel.y * deltaTime;
 
 		if (this.ball.left < 0 || this.ball.right > this._canvas.width) {
+			// trick with bitwise operator to get playerId
+			const playerId = this.ball.vel.x < 0 | 0;
+			// standard way to get playerId with if - else
+			// let playerId;
+			// if (this.ball.vel.x < 0){
+			// 	playerId = 1;
+			// } else {
+			// 	playerId = 0;
+			// }
+			this.players[playerId].score++;
+			console.log(this.players[1].score);
 			this.ball.vel.x = -this.ball.vel.x;
+			this.reset();
 		}
 		if (this.ball.top < 0 || this.ball.bottom > this._canvas.height) {
 			this.ball.vel.y = -this.ball.vel.y;
