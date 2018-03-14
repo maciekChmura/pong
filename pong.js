@@ -32,10 +32,10 @@ class Pong {
 	collide(player, ball) {
 		if (player.left < ball.right && player.right > ball.left &&
 			player.top < ball.bottom && player.bottom > ball.top) {
+			ball.vel.len *= 1.05;
 			ball.vel.x = -ball.vel.x;
 		}
 	}
-
 
 	draw() {
 		this._context.fillStyle = '#000';
@@ -50,12 +50,23 @@ class Pong {
 		this._context.fillRect(rect.left, rect.top, rect.size.x, rect.size.y);
 	}
 
-	reset(){
+	reset() {
 		this.ball.pos.x = this._canvas.width / 2;
 		this.ball.pos.y = this._canvas.height / 2;
 
-		this.ball.vel.x = 100;
-		this.ball.vel.y = 100;
+		this.ball.vel.x = 0;
+		this.ball.vel.y = 0;
+	}
+
+	start() {
+		if (this.ball.vel.x === 0 && this.ball.vel.y === 0) {
+			// randomize left/right direction
+			this.ball.vel.x = 250 * (Math.random() > 0.5 ? 1 : -1);
+			// randomize up/down direction
+			this.ball.vel.y = 250 * (Math.random() * 2 - 1);
+
+			this.ball.vel.len = 200;
+		}
 	}
 
 	update(deltaTime) {
@@ -93,6 +104,17 @@ class Vec {
 	constructor(x = 0, y = 0) {
 		this.x = x;
 		this.y = y;
+	}
+
+	// calculate Hypotenuse of a triangle - vector length
+	get len() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+
+	set len(value) {
+		const factor = value / this.len;
+		this.x *= factor;
+		this.y *= factor;
 	}
 }
 
@@ -138,4 +160,8 @@ const pong = new Pong(canvas);
 
 canvas.addEventListener('mousemove', event => {
 	pong.players[0].pos.y = event.offsetY;
+});
+
+canvas.addEventListener('click', event => {
+	pong.start();
 });
