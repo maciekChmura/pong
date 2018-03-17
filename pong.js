@@ -1,3 +1,8 @@
+const soundOver = new Audio('./sounds/sfx_sounds_Blip2.wav');
+const soundPlayer1 = new Audio('./sounds/sfx_sounds_Blip3.wav');
+const soundPlayer2 = new Audio('./sounds/sfx_sounds_Blip4.wav');
+const soundWall = new Audio('./sounds/sfx_sounds_Blip11.wav');
+
 class Pong {
 	constructor(canvas) {
 		this._canvas = canvas;
@@ -64,6 +69,11 @@ class Pong {
 			ball.vel.x = -ball.vel.x;
 			ball.vel.y += 300 * (Math.random() - 0.5);
 			ball.vel.len = len * 1.05;
+			if (ball.vel.x > 0) {
+				soundPlayer1.play();
+			} else {
+				soundPlayer2.play();
+			}
 		}
 	}
 
@@ -128,12 +138,13 @@ class Pong {
 			// 	playerId = 0;
 			// }
 			this.players[playerId].score++;
-			console.log(this.players[1].score);
 			this.ball.vel.x = -this.ball.vel.x;
+			soundOver.play();
 			this.reset();
 		}
 		if (this.ball.top < 0 || this.ball.bottom > this._canvas.height) {
 			this.ball.vel.y = -this.ball.vel.y;
+			soundWall.play();
 		}
 
 		this.players[1].pos.y = this.ball.pos.y;
